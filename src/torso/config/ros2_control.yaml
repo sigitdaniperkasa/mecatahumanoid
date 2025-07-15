@@ -1,0 +1,135 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+    
+    # Controller names to be loaded
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+      
+    torso_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+      
+    neck_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+      
+    right_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+      
+    left_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+torso_controller:
+  ros__parameters:
+    joints:
+      - torso_yaw_joint
+      - torso_pitch_joint
+      - torso_roll_joint
+    
+    command_interfaces:
+      - position
+    
+    state_interfaces:
+      - position
+      - velocity
+    
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    
+    allow_partial_joints_goal: false
+    constraints:
+      goal_time: 1.0
+      stopped_velocity_tolerance: 0.01
+      torso_yaw_joint:   {trajectory: 0.1, goal: 0.05}
+      torso_pitch_joint: {trajectory: 0.1, goal: 0.05}
+      torso_roll_joint:  {trajectory: 0.1, goal: 0.05}
+
+neck_controller:
+  ros__parameters:
+    joints:
+      - neck_yaw
+      - neck_pitch
+      - neck_roll
+    
+    command_interfaces:
+      - position
+    
+    state_interfaces:
+      - position
+      - velocity
+    
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    
+    allow_partial_joints_goal: false
+    constraints:
+      goal_time: 0.3
+      stopped_velocity_tolerance: 0.01
+      neck_yaw:   {trajectory: 0.08, goal: 0.04}
+      neck_pitch: {trajectory: 0.08, goal: 0.04}
+      neck_roll:  {trajectory: 0.08, goal: 0.04}
+
+right_arm_controller:
+  ros__parameters:
+    joints:
+      - right_shoulder_pitch
+      - right_shoulder_roll
+      - right_upper_arm_rotation
+      - right_elbow_pitch
+      - right_forearm_rotation
+      - right_wrist_pitch
+      - right_wrist_yaw
+    
+    command_interfaces:
+      - position
+    
+    state_interfaces:
+      - position
+      - velocity
+    
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    
+    allow_partial_joints_goal: false
+    constraints:
+      goal_time: 0.5
+      stopped_velocity_tolerance: 0.01
+      right_shoulder_pitch:     {trajectory: 0.05, goal: 0.03}
+      right_shoulder_roll:      {trajectory: 0.05, goal: 0.03}
+      right_upper_arm_rotation: {trajectory: 0.05, goal: 0.03}
+      right_elbow_pitch:        {trajectory: 0.05, goal: 0.03}
+      right_forearm_rotation:   {trajectory: 0.05, goal: 0.03}
+      right_wrist_pitch:        {trajectory: 0.05, goal: 0.03}
+      right_wrist_yaw:          {trajectory: 0.05, goal: 0.03}
+
+left_arm_controller:
+  ros__parameters:
+    joints:
+      - left_shoulder_pitch
+      - left_shoulder_roll
+      - left_upper_arm_rotation
+      - left_elbow_pitch
+      - left_forearm_rotation
+      - left_wrist_pitch
+      - left_wrist_yaw
+    
+    command_interfaces:
+      - position
+    
+    state_interfaces:
+      - position
+      - velocity
+    
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    
+    allow_partial_joints_goal: false
+    constraints:
+      goal_time: 0.5
+      stopped_velocity_tolerance: 0.01
+      left_shoulder_pitch:     {trajectory: 0.05, goal: 0.03}
+      left_shoulder_roll:      {trajectory: 0.05, goal: 0.03}
+      left_upper_arm_rotation: {trajectory: 0.05, goal: 0.03}
+      left_elbow_pitch:        {trajectory: 0.05, goal: 0.03}
+      left_forearm_rotation:   {trajectory: 0.05, goal: 0.03}
+      left_wrist_pitch:        {trajectory: 0.05, goal: 0.03}
+      left_wrist_yaw:          {trajectory: 0.05, goal: 0.03}
