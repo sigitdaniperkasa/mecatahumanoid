@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="rover">
+
+  <!-- ================= Constants ================= -->
+  <xacro:property name="base_length"  value="1.5"/>
+  <xacro:property name="base_width"   value="2.0"/>
+  <xacro:property name="base_height"  value="0.8"/>
+  <xacro:property name="wheel_radius" value="0.133"/>
+  <xacro:property name="wheel_width"  value="0.3"/>
+  <!-- Z offset of wheel centre above base_link frame -->
+  <xacro:property name="wheel_origin_z" value="${wheel_radius}"/>
+
+  <!-- ================= Base Link ================= -->
+  <link name="base_link">
+    <visual>
+      <!-- Place the box so its bottom rests on z=0 -->
+      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="gray">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- ================= Wheel Macro ================= -->
+  <xacro:macro name="wheel" params="name parent x y">
+    <link name="${name}">
+      <visual>
+        <!-- Rotate cylinder so its axis points along y -->
+        <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+    </link>
+    <joint name="joint_${name}" type="fixed">
+      <parent link="${parent}"/>
+      <child  link="${name}"/>
+      <origin xyz="${x} ${y} ${wheel_origin_z}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ================= Instantiate Wheels ================= -->
+  <xacro:wheel name="wheel_front_left"  parent="base_link" x=" 0.90" y=" 0.873"/>
+  <xacro:wheel name="wheel_front_right" parent="base_link" x=" 0.90" y="-0.873"/>
+  <xacro:wheel name="wheel_rear_left"   parent="base_link" x="-0.90" y=" 0.873"/>
+  <xacro:wheel name="wheel_rear_right"  parent="base_link" x="-0.90" y="-0.873"/>
+
+</robot>
