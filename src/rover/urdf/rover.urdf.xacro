@@ -1,19 +1,36 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="rover">
 
-  <!-- ================= Constants ================= -->
-  <xacro:property name="base_length"  value="1.5"/>
-  <xacro:property name="base_width"   value="2.0"/>
+  <!-- ===================== Constants ===================== -->
+  <!-- Bikin sisi panjang mengikuti sumbu X (maju) -->
+  <xacro:property name="base_length"  value="2.0"/>   <!-- arah X -->
+  <xacro:property name="base_width"   value="1.5"/>   <!-- arah Y -->
   <xacro:property name="base_height"  value="0.8"/>
+
   <xacro:property name="wheel_radius" value="0.133"/>
   <xacro:property name="wheel_width"  value="0.3"/>
-  <!-- Z offset of wheel centre above base_link frame -->
+
+  <!-- Z posisi pusat roda terhadap frame base_link (z=0 di lantai) -->
   <xacro:property name="wheel_origin_z" value="${wheel_radius}"/>
 
-  <!-- ================= Base Link ================= -->
+  <!-- Offset roda dari ujung-ujung base (biar tidak mepet) -->
+  <xacro:property name="edge_margin_x" value="0.10"/>
+  <xacro:property name="wheel_x" value="${base_length/2 - edge_margin_x}"/>
+  <!-- Posisikan roda di luar sisi base (tambah setengah lebar roda) -->
+  <xacro:property name="wheel_y" value="${base_width/2 + wheel_width/2}"/>
+
+  <!-- ===================== Frames (opsional tapi rapi) ===================== -->
+  <link name="base_footprint"/>
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child  link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===================== Base Link ===================== -->
   <link name="base_link">
     <visual>
-      <!-- Place the box so its bottom rests on z=0 -->
+      <!-- Letakkan box sehingga sisi bawah pas di z=0 -->
       <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
       <geometry>
         <box size="${base_length} ${base_width} ${base_height}"/>
@@ -22,14 +39,22 @@
         <color rgba="0.7 0.7 0.7 1.0"/>
       </material>
     </visual>
+
+    <!-- (opsional) collision sama dengan visual -->
+    <collision>
+      <origin xyz="0 0 ${base_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>
   </link>
 
-  <!-- ================= Wheel Macro ================= -->
+  <!-- ===================== Wheel Macro ===================== -->
   <xacro:macro name="wheel" params="name parent x y">
     <link name="${name}">
       <visual>
-        <!-- Rotate cylinder so its axis points along y -->
-        <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+        <!-- Putar silinder 90° di sumbu X supaya sumbu silinder = Y (sumbu putar roda) -->
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
         <geometry>
           <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
         </geometry>
@@ -37,7 +62,15 @@
           <color rgba="0.1 0.1 0.1 1.0"/>
         </material>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
     </link>
+
     <joint name="joint_${name}" type="fixed">
       <parent link="${parent}"/>
       <child  link="${name}"/>
@@ -45,10 +78,12 @@
     </joint>
   </xacro:macro>
 
-  <!-- ================= Instantiate Wheels ================= -->
-  <xacro:wheel name="wheel_front_left"  parent="base_link" x=" 0.90" y=" 0.873"/>
-  <xacro:wheel name="wheel_front_right" parent="base_link" x=" 0.90" y="-0.873"/>
-  <xacro:wheel name="wheel_rear_left"   parent="base_link" x="-0.90" y=" 0.873"/>
-  <xacro:wheel name="wheel_rear_right"  parent="base_link" x="-0.90" y="-0.873"/>
+  <!-- ===================== Instantiate 4 Wheels ===================== -->
+  <!-- Depan = +X, Kiri = +Y -->
+  <xacro:wheel name="wheel_front_left"  parent="base_link" x="${ wheel_x}" y="${ wheel_y}"/>
+  <xacro:wheel name="wheel_front_right" parent="base_link" x="${ wheel_x}" y="${-wheel_y}"/>
+  <xacro:wheel name="wheel_rear_left"   parent="base_link" x="${-wheel_x}" y="${ wheel_y}"/>
+  <xacro:wheel name="wheel_rear_right"  parent="base_link" x="${-wheel_x}" y="${-wheel_y}"/>
 
 </robot>
+
