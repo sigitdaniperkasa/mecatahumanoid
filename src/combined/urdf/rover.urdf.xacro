@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="rover_rigid_y_wheels">
+
+  <!-- materials -->
+  <material name="gray"><color rgba="0.7 0.7 0.7 1.0"/></material>
+  <material name="black"><color rgba="0.1 0.1 0.1 1.0"/></material>
+  <material name="dark"><color rgba="0.2 0.2 0.25 1.0"/></material>
+  <material name="red"><color rgba="0.8 0.1 0.1 1.0"/></material>
+  <material name="silver"><color rgba="0.8 0.8 0.9 1.0"/></material>
+
+  <!-- Constants -->
+  <xacro:property name="base_length" value="1.0"/>
+  <xacro:property name="base_width" value="0.5"/>
+  <xacro:property name="base_height" value="0.25"/>
+  
+  <xacro:property name="arm_length" value="0.6"/>
+  <xacro:property name="arm_thickness" value="0.08"/>
+  <xacro:property name="arm_depth" value="0.06"/>
+  
+  <xacro:property name="wheel_radius" value="0.165"/>
+  <xacro:property name="wheel_width" value="0.3"/>
+
+  <!-- BASE LINK -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="${base_length} ${base_width} ${base_height}"/></geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="${base_length} ${base_width} ${base_height}"/></geometry>
+    </collision>
+  </link>
+
+<!-- IMU sensor -->
+<link name="imu_link">
+  <visual>
+    <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.05 0.05 0.02"/>
+    </geometry>
+    <material name="dark"/>
+  </visual>
+</link>
+
+<joint name="imu_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="imu_link"/>
+  <origin xyz="0 0 0.20" rpy="0 0 0"/>
+</joint>
+
+
+  <!-- LIDAR LINK -->
+  <link name="lidar_link">
+    <visual>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.1"/></geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.1"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001"
+               ixy="0.0" ixz="0.0" iyz="0.0"/>
+    </inertial>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ARM MACRO -->
+  <xacro:macro name="arm" params="name parent x_pos y_pos visual_origin visual_rpy">
+    <link name="${name}">
+      <visual>
+        <origin xyz="${visual_origin}" rpy="${visual_rpy}"/>
+        <geometry><box size="${arm_length} ${arm_thickness} ${arm_depth}"/></geometry>
+        <material name="silver"/>
+      </visual>
+      <collision>
+        <origin xyz="${visual_origin}" rpy="${visual_rpy}"/>
+        <geometry><box size="${arm_length} ${arm_thickness} ${arm_depth}"/></geometry>
+      </collision>
+    </link>
+    <joint name="fix_${name}" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+      <origin xyz="${x_pos} ${y_pos} 0.000" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- WHEEL MACRO -->
+  <xacro:macro name="wheel" params="name parent origin_xyz">
+    <link name="${name}">
+      <visual>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      </collision>
+    </link>
+    <joint name="fix_${name}" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+      <origin xyz="${origin_xyz}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Instantiate Arms -->
+  <xacro:arm name="arm_front_left" parent="base_link" 
+             x_pos="0.200" y_pos="0.520"
+             visual_origin="0.2 -0.230 -0.2" visual_rpy="0 0.785398 0"/>
+  
+  <xacro:arm name="arm_front_right" parent="base_link" 
+             x_pos="0.200" y_pos="-0.520"
+             visual_origin="0.2 0.230 -0.2" visual_rpy="0 0.785398 0"/>
+  
+  <xacro:arm name="arm_rear_left" parent="base_link" 
+             x_pos="-0.200" y_pos="0.520"
+             visual_origin="-0.2 -0.230 -0.2" visual_rpy="0 0.785398 3.141593"/>
+  
+  <xacro:arm name="arm_rear_right" parent="base_link" 
+             x_pos="-0.200" y_pos="-0.520"
+             visual_origin="-0.2 0.230 -0.2" visual_rpy="0 0.785398 3.141593"/>
+
+  <!-- Instantiate Wheels -->
+  <xacro:wheel name="wheel_front_left" parent="arm_front_left" origin_xyz="0.42426 -0.05 -0.424268"/>
+  <xacro:wheel name="wheel_front_right" parent="arm_front_right" origin_xyz="0.42426 0.05 -0.424268"/>
+  <xacro:wheel name="wheel_rear_left" parent="arm_rear_left" origin_xyz="-0.42426 -0.05 -0.424268"/>
+  <xacro:wheel name="wheel_rear_right" parent="arm_rear_right" origin_xyz="-0.42426 0.05 -0.424268"/>
+
+</robot>
+
